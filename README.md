@@ -81,13 +81,6 @@ http://localhost:8082/
 
 > *<img width="1873" height="797" alt="Screenshot 2026-05-02 132155" src="https://github.com/user-attachments/assets/fd4c57fc-8c1a-4767-8ae6-45e114a3e640" />
 *
-
-```
-![UI Screenshot](your-image-link-here)
-```
-
----
-
 ## ⚙️ Key Concepts Used
 
 * REST API Design
