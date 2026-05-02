@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Book Inventory</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f4f6f9;
+            margin: 0;
+        }
+
+        .container {
+            width: 90%;
+            margin: auto;
+            margin-top: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        input {
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 18%;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .add-btn {
+            background: #28a745;
+            color: white;
+        }
+
+        .add-btn:hover {
+            background: #218838;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #c82333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #007bff;
+            color: white;
+            padding: 10px;
+        }
+
+        td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:hover {
+            background: #f1f1f1;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>📚 Book Inventory</h1>
+
+    <div class="card">
+        <h3>Add Book</h3>
+        <input type="text" id="title" placeholder="Title">
+        <input type="text" id="author" placeholder="Author">
+        <input type="text" id="isbn" placeholder="ISBN">
+        <input type="number" id="price" placeholder="Price">
+        <input type="number" id="quantity" placeholder="Quantity">
+        <button class="add-btn" onclick="addBook()">Add Book</button>
+    </div>
+
+    <div class="card">
+        <h3>Book List</h3>
+
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Price</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody id="bookTable"></tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+
+    const API = "http://localhost:8082/api/v1/books";
+
+    function loadBooks() {
+        fetch(API)
+        .then(res => res.json())
+        .then(data => {
+            const table = document.getElementById("bookTable");
+            table.innerHTML = "";
+
+            data.content.forEach(book => {
+                table.innerHTML += `
+                    <tr>
+                        <td>${book.id}</td>
+                        <td>${book.title}</td>
+                        <td>${book.author}</td>
+                        <td>₹${book.price}</td>
+                        <td>
+                            <button class="delete-btn" onclick="deleteBook(${book.id})">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        });
+    }
+
+    function addBook() {
+        const book = {
+            title: document.getElementById("title").value,
+            author: document.getElementById("author").value,
+            isbn: document.getElementById("isbn").value,
+            price: parseFloat(document.getElementById("price").value),
+            quantity: parseInt(document.getElementById("quantity").value)
+        };
+
+        fetch(API, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(book)
+        })
+        .then(res => {
+            if (!res.ok) throw new Error("Error adding book");
+            return res.json();
+        })
+        .then(() => {
+            clearForm();
+            loadBooks();
+        })
+        .catch(err => alert(err.message));
+    }
+
+    function deleteBook(id) {
+        fetch(`${API}/${id}`, { method: "DELETE" })
+        .then(() => loadBooks());
+    }
+
+    function clearForm() {
+        document.getElementById("title").value = "";
+        document.getElementById("author").value = "";
+        document.getElementById("isbn").value = "";
+        document.getElementById("price").value = "";
+        document.getElementById("quantity").value = "";
+    }
+
+    loadBooks();
+
+</script>
+
+</body>
+</html>
